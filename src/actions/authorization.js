@@ -14,11 +14,11 @@ export const login = (payload) => dispatch => {
 	setTimeout(() => {
 		signIn(username, password)
 			.then((data) => {
-				console.log(data);
+				const userData = { ...data, loginStatus: true };
+				localStorage.setItem('auth', JSON.stringify(userData));
 				dispatch({type: SIGNIN_SUCCESS, payload: data});
 			})
 			.catch(error => {
-				console.log(error);
 				dispatch({type: SIGNIN_ERROR, payload: error});
 			})
 	},1000);
@@ -28,11 +28,19 @@ export const logout = () => dispatch => {
 	dispatch({type: SIGNOUT_REQUEST});
 	signOut()
 		.then((data) => {
-			console.log(data);
+			localStorage.removeItem('auth');
 			dispatch({type: SIGNOUT_SUCCESS, payload: data});
 		})
 		.catch(error => {
-			console.log(error);
 			dispatch({type: SIGNOUT_ERROR, payload: error});
 		})
+};
+
+export const checkUser = () => dispatch => {
+	const checkData = localStorage.getItem('auth');
+	if (!checkData) {
+		return;
+	}
+	const userData = JSON.parse(checkData);
+	dispatch({type: SIGNIN_SUCCESS, payload: userData});
 };
